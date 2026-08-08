@@ -1,6 +1,4 @@
-// ESP32-S3 SuperMini + Bluepad32 (Xbox One S) + MPU6050 + 4x SI2300 MOSFET
-// брашед-дрон. Логіка стабілізації (Mahony AHRS + каскад angle/rate PID +
-// X-мікшер) портована зі структури офіційного espressif/esp-drone.
+
 
 #include "Config.h"
 #include "GamepadManager.h"
@@ -23,10 +21,7 @@ unsigned long armHoldStartMs = 0;
 unsigned long lastLoopMicros = 0;
 unsigned long lastDebugPrintMs = 0;
 
-// Три режими виводу залежно від стану:
-//   armed              -> детальна телеметрія кожні DEBUG_PRINT_INTERVAL_MS
-//   disarmed + gamepad -> TEST MODE: розкладка стіків з підписами (250мс)
-//   disarmed, no gp    -> heartbeat раз на STATUS_HEARTBEAT_INTERVAL_MS
+
 const char* pitchLabel(float v) {
   if (v > 0.15f) return "ВПЕРЕД";
   if (v < -0.15f) return "НАЗАД";
@@ -121,16 +116,11 @@ void updateArmState(const GamepadManager::State& gs, bool gamepadOk) {
     }
   }
 
-  // Автокалібрування gyro-bias + level trim одразу після кожного DISARM
-  // (незалежно від причини - кнопка чи failsafe). Мотори вже примусово 0
-  // (disableAll() нижче в loop()), тому ~2с блокуючої калібровки тут
-  // безпечна. Компенсує температурний/часовий дрейф gyro-bias і трохи
-  // усереднює похибку монтажу MPU6050 між польотами, без потреби
-  // перезавантажувати плату. Дрон МАЄ лежати рівно й нерухомо в цей момент.
+
   if (wasArmed && !armed && imuOk) {
     motors.disableAll();
     Serial.println("DISARM -> автокалібрування IMU (дрон рівно, не рухати; чекає спокою)");
-    imu.recalibrate();  // сама друкує деталі
+    imu.recalibrate();  
   }
 }
 
