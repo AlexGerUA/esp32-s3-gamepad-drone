@@ -1,0 +1,29 @@
+# Arduino IDE / arduino-cli build artifacts
+build/
+.pio/
+.piolibdeps/
+.vscode/
+*.hex
+*.bin
+*.elf
+*.map
+
+# Arduino IDE cache directories that end up next to sketches
+sketch/
+
+# OS clutter
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor swap / backup files
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+# Development-time working files (not for public repo)
+CLAUDE.md
+.claude/
+.kilocode/
