@@ -46,36 +46,24 @@ MotorOutputs StabilizationController::compute(float throttleDuty, float pitchCmd
     return MotorOutputs{};
   }
 
-  // Yaw - не прямий rate-control: стік інтегрується в ціль (як modeVelocity
-  // у ESP-Drone), ціль тримається, коли стік у нулі.
+
   _yawTargetDeg = capAngle(_yawTargetDeg + yawRateCmd * MAX_YAW_RATE_DEG_S * dtSeconds);
 
-  // pitchCmd інвертовано ТУТ (тільки для user-команди, не для self-stabilization):
-  // стік "вперед" (pitchCmd>0) → бажаний нахил ніс униз (setpoint<0) → дрон
-  // летить вперед. Self-stabilization працює з поточним знаком pitchOutput.
+
   float pitchSetpointDeg = -pitchCmd * MAX_TILT_ANGLE_DEG;
   float rollSetpointDeg = rollCmd * MAX_TILT_ANGLE_DEG;
 
-  // --- Зовнішній (angle) контур: кут -> бажана кутова швидкість ---
   float rateDesiredRoll = _rollAnglePid.compute(rollSetpointDeg, measuredRollDeg, dtSeconds);
   float rateDesiredPitch = _pitchAnglePid.compute(pitchSetpointDeg, measuredPitchDeg, dtSeconds);
 
   float yawError = capAngle(_yawTargetDeg - measuredYawDeg);
   float rateDesiredYaw = _yawAnglePid.computeFromError(yawError, dtSeconds);
 
-  // --- Внутрішній (rate) контур: gyro-швидкість -> сирий duty-вихід ---
-  // ROLL ІНВЕРТОВАНИЙ для нашого монтажу MPU (діагноз 2026-07-28):
-  // без інверсії дрон перевертався ліворуч при зльоті - позитивний
-  // зворотний зв'язок. Pitch НЕ інвертувати - self-stabilization pitch
-  // працює правильно з поточним знаком (спроба інвертувати 2026-07-29
-  // призвела до миттєвого перекидання; інверсія user-команди pitch
-  // окремо, у setpoint нижче).
+
   float rollOutput = -_rollRatePid.compute(rateDesiredRoll, measuredGyroXDegS, dtSeconds);
   float pitchOutput = _pitchRatePid.compute(rateDesiredPitch, -measuredGyroYDegS, dtSeconds);
   float yawOutput = -_yawRatePid.compute(rateDesiredYaw, measuredGyroZDegS, dtSeconds);
-  // control->yaw = -control->yaw в оригіналі - інверсія застосована вище.
 
-  // --- X-мікшер (power_distribution_stock.c, QUAD_FORMATION_X) ---
   float r = rollOutput / 2.0f;
   float p = pitchOutput / 2.0f;
 
