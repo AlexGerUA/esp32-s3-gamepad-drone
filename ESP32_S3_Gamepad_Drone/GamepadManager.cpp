@@ -76,12 +76,7 @@ void GamepadManager::update() {
   _state.connected = true;
   _state.lastUpdateMs = millis();
 
-  // FPS-стиль розкладка (2026-07-29):
-  //   RT (правий тригер) -> throttle (не самоцентрується, безпечно)
-  //   Лівий стік Y (вгору) -> pitch (вперед)
-  //   Лівий стік X (вправо) -> roll (вправо)
-  //   Правий стік X -> yaw (поворот навколо осі)
-  //   Правий стік Y -> НЕ використовується
+
   _state.throttle = ctl->throttle() / 1023.0f;  // 0..1
 
   _state.pitch = applyDeadzone(normalizeAxis(-ctl->axisY()), STICK_DEADZONE);
