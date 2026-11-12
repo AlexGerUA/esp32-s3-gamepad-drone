@@ -1,5 +1,7 @@
 # ESP32-S3 Gamepad Drone
 
+**English** | [Українська](README.uk.md)
+
 A DIY brushed-motor quadcopter flight controller for the **ESP32-S3 Super Mini**, piloted by an **Xbox One S controller** over Bluetooth. Stabilization architecture is ported from Espressif's [esp-drone](https://github.com/espressif/esp-drone) firmware (Mahony AHRS + cascaded angle/rate PID + X-frame mixer), adapted to run on top of a **hand-built low-side N-MOSFET driver board** instead of the ESCs used on brushless quads.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
